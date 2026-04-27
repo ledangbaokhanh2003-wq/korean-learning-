@@ -114,12 +114,22 @@ if menu == "📖 Từ vựng":
     st.markdown("<p style='color: var(--text-sub); font-size: 16px; margin-top: -10px;'>Trạm lưu trữ từ vựng cá nhân hóa.</p>", unsafe_allow_html=True)
     st.divider()
 
-    search = st.text_input("🔍 Tìm kiếm từ vựng...", placeholder="Nhập từ tiếng Hàn hoặc tiếng Anh/Việt")
+    # TÍNH NĂNG MỚI: Chia cột để thêm nút sắp xếp cạnh thanh tìm kiếm
+    col_search, col_sort = st.columns([3, 1])
+    with col_search:
+        search = st.text_input("🔍 Tìm kiếm từ vựng...", placeholder="Nhập từ tiếng Hàn hoặc tiếng Anh/Việt")
+    with col_sort:
+        sort_order = st.selectbox("↕️ Sắp xếp", ["✨ Mới nhất trước", "⏳ Cũ nhất trước"])
 
+    # 1. Lọc theo tìm kiếm
     if search:
         df_display = df_vocab[df_vocab['Từ gốc'].str.contains(search, case=False) | df_vocab['Nghĩa (English)'].str.contains(search, case=False)]
     else:
-        df_display = df_vocab
+        df_display = df_vocab.copy()
+
+    # 2. Áp dụng sắp xếp (Mới nhất = Đảo ngược dữ liệu từ dưới lên trên)
+    if sort_order == "✨ Mới nhất trước":
+        df_display = df_display.iloc[::-1]
 
     def render_cards(data, tab_key):
         if data.empty:
