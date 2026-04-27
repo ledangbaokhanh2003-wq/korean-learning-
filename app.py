@@ -50,10 +50,70 @@ st.markdown("""
         padding: 20px;
         margin-bottom: 20px;
         transition: all 0.2s ease;
+        position: relative; /* Dùng để căn chỉnh mũi tên ▼ */
     }
     .card-container:hover {
         box-shadow: 0 8px 24px rgba(0,0,0,0.05);
         border-color: var(--card-hover);
+    }
+
+    /* --- CSS CHO PHẦN XỔ XUỐNG CÓ KHUNG ĐẸP MẮT --- */
+    details.custom-expander {
+        margin-bottom: 20px;
+    }
+    details.custom-expander .card-container {
+        margin-bottom: 0; /* Xóa khoảng trống thừa để nối liền với khung dưới */
+    }
+    details.custom-expander summary {
+        list-style: none;
+        cursor: pointer;
+    }
+    details.custom-expander summary::-webkit-details-marker {
+        display: none;
+    }
+    
+    /* Khi mở thẻ: Làm phẳng mép dưới để gắn liền với khung mở rộng */
+    details[open] .card-container {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-bottom: 1px dashed var(--card-border);
+    }
+
+    /* KHUNG 1: Nền xám bọc ngoài phần nội dung xổ xuống */
+    .expanded-content {
+        background-color: var(--grammar-bg);
+        border: 1px solid var(--card-border);
+        border-top: none;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+        padding: 20px;
+    }
+    
+    /* KHUNG 2: Bo tròn, viền nhạt cho khu vực chia thì */
+    .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        color: var(--text-main);
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    
+    /* KHUNG 3: Viền xanh nổi bật cho ví dụ */
+    .example-box {
+        padding: 15px;
+        background-color: var(--card-bg);
+        border: 1px solid rgba(66, 133, 244, 0.3);
+        border-left: 5px solid #4285F4;
+        border-radius: 10px;
+        color: var(--text-main);
+        font-size: 14.5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
     .grammar-card {
