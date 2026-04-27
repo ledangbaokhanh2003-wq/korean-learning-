@@ -14,6 +14,27 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
     
+    /* 🌟 BỘ LỌC THÔNG MINH CHO SÁNG/TỐI (TỰ ĐỘNG) */
+    :root {
+        --card-bg: #ffffff;
+        --card-border: #F1F3F5;
+        --card-hover: #e9ecef;
+        --text-main: #212529;
+        --text-sub: #495057;
+        --grammar-bg: #F8F9FA;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --card-bg: #262730; /* Nền xám đậm cho thẻ */
+            --card-border: #444444; /* Viền tối màu */
+            --card-hover: #666666;
+            --text-main: #FAFAFA; /* Chữ màu trắng sáng */
+            --text-sub: #CCCCCC; /* Chữ xám nhạt */
+            --grammar-bg: #1E1E1E;
+        }
+    }
+
     html, body, [class*="css"] {
         font-family: 'Noto Sans KR', sans-serif;
     }
@@ -22,8 +43,8 @@ st.markdown("""
     
     /* Thiết kế thẻ Card cho Từ vựng */
     .card-container {
-        background-color: #ffffff;
-        border: 1px solid #F1F3F5;
+        background-color: var(--card-bg);
+        border: 1px solid var(--card-border);
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 20px;
@@ -31,20 +52,20 @@ st.markdown("""
     }
     .card-container:hover {
         box-shadow: 0 8px 24px rgba(0,0,0,0.05);
-        border-color: #e9ecef;
+        border-color: var(--card-hover);
     }
 
     /* Thiết kế thẻ Card riêng cho Ngữ pháp */
     .grammar-card {
-        background-color: #F8F9FA;
+        background-color: var(--grammar-bg);
         border-left: 5px solid #4285F4;
         border-radius: 8px;
         padding: 20px;
         margin-bottom: 15px;
     }
 
-    .ko-title { font-size: 26px; font-weight: 700; color: #212529; margin-bottom: 2px; }
-    .vi-meaning { font-size: 16px; color: #495057; margin-bottom: 12px; }
+    .ko-title { font-size: 26px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+    .vi-meaning { font-size: 16px; color: var(--text-sub); margin-bottom: 12px; }
     .grammar-title { font-size: 22px; font-weight: 700; color: #1A73E8; margin-bottom: 8px; }
 
     .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-right: 6px; }
@@ -92,7 +113,7 @@ with st.sidebar:
 # ==========================================
 if menu == "📖 Từ vựng":
     st.title("📚 나의 한국어 사전 (Từ Vựng)")
-    st.markdown("<p style='color: #868e96; font-size: 16px; margin-top: -10px;'>Trạm lưu trữ từ vựng cá nhân hóa.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: var(--text-sub); font-size: 16px; margin-top: -10px;'>Trạm lưu trữ từ vựng cá nhân hóa.</p>", unsafe_allow_html=True)
     st.divider()
 
     search = st.text_input("🔍 Tìm kiếm từ vựng...", placeholder="Nhập từ tiếng Hàn hoặc tiếng Anh/Việt")
@@ -159,7 +180,7 @@ if menu == "📖 Từ vựng":
 # ==========================================
 elif menu == "📝 Ngữ pháp":
     st.title("📝 Sổ tay Ngữ pháp")
-    st.markdown("<p style='color: #868e96; font-size: 16px; margin-top: -10px;'>Hệ thống hóa cấu trúc câu tiếng Hàn.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: var(--text-sub); font-size: 16px; margin-top: -10px;'>Hệ thống hóa cấu trúc câu tiếng Hàn.</p>", unsafe_allow_html=True)
     st.divider()
 
     search_g = st.text_input("🔍 Tìm kiếm cấu trúc...", placeholder="Nhập ngữ pháp hoặc ý nghĩa tiếng Việt...")
