@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import os
+from datetime import datetime
 
 # 1. CẤU HÌNH TRANG
 st.set_page_config(
@@ -26,11 +28,11 @@ st.markdown("""
 
     @media (prefers-color-scheme: dark) {
         :root {
-            --card-bg: #262730; /* Nền xám đậm cho thẻ */
-            --card-border: #444444; /* Viền tối màu */
+            --card-bg: #262730;
+            --card-border: #444444;
             --card-hover: #666666;
-            --text-main: #FAFAFA; /* Chữ màu trắng sáng */
-            --text-sub: #CCCCCC; /* Chữ xám nhạt */
+            --text-main: #FAFAFA;
+            --text-sub: #CCCCCC;
             --grammar-bg: #1E1E1E;
         }
     }
@@ -41,7 +43,6 @@ st.markdown("""
     
     .block-container { padding-top: 2rem; }
     
-    /* Thiết kế thẻ Card cho Từ vựng */
     .card-container {
         background-color: var(--card-bg);
         border: 1px solid var(--card-border);
@@ -55,7 +56,6 @@ st.markdown("""
         border-color: var(--card-hover);
     }
 
-    /* Thiết kế thẻ Card riêng cho Ngữ pháp */
     .grammar-card {
         background-color: var(--grammar-bg);
         border-left: 5px solid #4285F4;
@@ -76,7 +76,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 3. KẾT NỐI DỮ LIỆU GOOGLE SHEETS
-# Bạn hãy dán 2 link CSV tương ứng vào dưới đây:
 VOCAB_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1UXIB65E42LIrgxKSH2Mp0fw09NB3PC67AErwV5pFdP1e06KEBNytC7MdnlIhCANL7CNsWBa-WGOi/pub?gid=0&single=true&output=csv"
 GRAMMAR_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1UXIB65E42LIrgxKSH2Mp0fw09NB3PC67AErwV5pFdP1e06KEBNytC7MdnlIhCANL7CNsWBa-WGOi/pub?gid=954320771&single=true&output=csv" 
 
@@ -89,7 +88,6 @@ def load_data(url, is_grammar=False):
         return df
     except Exception as e:
         st.error(f"⚠️ Lỗi đọc Google Sheets: {e}")
-        st.warning("Đang hiển thị dữ liệu dự phòng. Vui lòng kiểm tra lại link 'Publish to web'.")
         if is_grammar:
             data = [{"Cấu trúc": "-아/어서", "Ý nghĩa": "Vì... nên...", "Ví dụ": "비가 와서 집에 있어요.", "Ghi chú": "Không dùng đuôi mệnh lệnh"}]
             return pd.DataFrame(data)
@@ -100,16 +98,16 @@ def load_data(url, is_grammar=False):
 df_vocab = load_data(VOCAB_URL, is_grammar=False)
 df_grammar = load_data(GRAMMAR_URL, is_grammar=True)
 
-# 4. THANH MENU BÊN TRÁI (SIDEBAR)
+# 4. THANH MENU BÊN TRÁI (SIDEBAR) - Đã thêm mục Luyện viết
 with st.sidebar:
-    st.image("https://flagcdn.com/w160/kr.png", width=60) # Logo cờ Hàn Quốc chuẩn
+    st.image("https://flagcdn.com/w160/kr.png", width=60)
     st.title("Menu")
-    menu = st.radio("Chọn không gian học tập:", ["📖 Từ vựng", "📝 Ngữ pháp"])
+    menu = st.radio("Chọn không gian học tập:", ["📖 Từ vựng", "📝 Ngữ pháp", "✍️ Luyện viết"])
     st.markdown("---")
     st.caption("Cập nhật dữ liệu trực tiếp từ Google Sheets.")
 
 # ==========================================
-# KHÔNG GIAN 1: TỪ VỰNG (Giữ nguyên như cũ)
+# KHÔNG GIAN 1: TỪ VỰNG 
 # ==========================================
 if menu == "📖 Từ vựng":
     st.title("📚 나의 한국어 사전 (Từ Vựng)")
@@ -176,14 +174,14 @@ if menu == "📖 Từ vựng":
     with tab_noun: render_cards(df_display[~df_display['Loại'].isin(["Động từ", "Tính từ"])], "noun")
 
 # ==========================================
-# KHÔNG GIAN 2: NGỮ PHÁP (Mới)
+# KHÔNG GIAN 2: NGỮ PHÁP 
 # ==========================================
 elif menu == "📝 Ngữ pháp":
     st.title("📝 Sổ tay Ngữ pháp")
     st.markdown("<p style='color: var(--text-sub); font-size: 16px; margin-top: -10px;'>Hệ thống hóa cấu trúc câu tiếng Hàn.</p>", unsafe_allow_html=True)
     st.divider()
 
-    search_g = st.text_input("🔍 Tìm kiếm cấu trúc...", placeholder="Nhập ngữ pháp hoặc ý nghĩa tiếng Việt...")
+    search_g = st.text_input("🔍 Tìm kiếm cấu trúc...", placeholder="Nhập ngữ pháp hoặc ý nghĩa...")
 
     if search_g:
         df_g_display = df_grammar[df_grammar['Cấu trúc'].str.contains(search_g, case=False) | df_grammar['Ý nghĩa'].str.contains(search_g, case=False)]
@@ -193,7 +191,6 @@ elif menu == "📝 Ngữ pháp":
     if df_g_display.empty:
         st.warning("Không tìm thấy ngữ pháp phù hợp.")
     else:
-        # Hiển thị từng ngữ pháp dạng danh sách từ trên xuống
         for idx, row in df_g_display.iterrows():
             st.markdown(f"""
             <div class="grammar-card">
@@ -207,4 +204,76 @@ elif menu == "📝 Ngữ pháp":
                 
             with st.expander("💬 Xem ví dụ chi tiết"):
                 st.success(row.get('Ví dụ', '-'))
-            st.write("") # Tạo khoảng trống giữa các ngữ pháp
+            st.write("") 
+
+# ==========================================
+# KHÔNG GIAN 3: LUYỆN VIẾT (TÍNH NĂNG MỚI)
+# ==========================================
+elif menu == "✍️ Luyện viết":
+    st.title("✍️ Không gian Luyện viết")
+    st.markdown("<p style='color: var(--text-sub); font-size: 16px; margin-top: -10px;'>Tự đặt câu và lưu lại nhật ký học tập của bạn.</p>", unsafe_allow_html=True)
+    st.divider()
+
+    # Khởi tạo file lưu trữ dạng CSV cục bộ
+    PRACTICE_FILE = "luyenviet.csv"
+
+    # Đọc dữ liệu cũ nếu đã từng lưu
+    if os.path.exists(PRACTICE_FILE):
+        df_practice = pd.read_csv(PRACTICE_FILE)
+    else:
+        df_practice = pd.DataFrame(columns=["Thời gian", "Tiếng Hàn", "Nghĩa (English)"])
+
+    # 1. Khu vực Nhập liệu
+    st.markdown("### ➕ Thêm câu mới")
+    with st.form("practice_form", clear_on_submit=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            kor_sentence = st.text_area("🇰🇷 Câu tiếng Hàn", placeholder="Ví dụ: 저는 오늘 한국어를 공부합니다.")
+        with col2:
+            eng_meaning = st.text_area("🇬🇧 Nghĩa tiếng Anh (English)", placeholder="Ví dụ: I study Korean today.")
+
+        submitted = st.form_submit_button("💾 Lưu vào nhật ký")
+
+        if submitted:
+            if kor_sentence.strip() == "" or eng_meaning.strip() == "":
+                st.warning("⚠️ Vui lòng điền đầy đủ cả tiếng Hàn và tiếng Anh nhé!")
+            else:
+                # Ghi lại câu mới
+                new_data = pd.DataFrame({
+                    "Thời gian": [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
+                    "Tiếng Hàn": [kor_sentence],
+                    "Nghĩa (English)": [eng_meaning]
+                })
+                # Đẩy câu mới lên đầu danh sách
+                df_practice = pd.concat([new_data, df_practice], ignore_index=True)
+                df_practice.to_csv(PRACTICE_FILE, index=False)
+                st.success("🎉 Đã lưu thành công!")
+                st.rerun() # Tự động làm mới trang để hiện câu vừa nhập
+
+    st.divider()
+
+    # 2. Khu vực hiển thị và quản lý
+    st.markdown("### 🗂️ Nhật ký của bạn")
+    
+    if not df_practice.empty:
+        # Nút Tải về máy
+        csv_export = df_practice.to_csv(index=False).encode('utf-8-sig')
+        st.download_button(
+            label="⬇️ Tải nhật ký về máy (Định dạng CSV)",
+            data=csv_export,
+            file_name="nhat_ky_luyen_viet.csv",
+            mime="text/csv",
+        )
+        st.write("") # Tạo khoảng trống
+
+        # Hiển thị các câu đã lưu
+        for idx, row in df_practice.iterrows():
+            st.markdown(f"""
+            <div class="card-container" style="padding: 15px; margin-bottom: 12px; border-left: 4px solid #34A853;">
+                <div style="font-size: 12px; color: gray; margin-bottom: 5px;">🕒 {row['Thời gian']}</div>
+                <div style="font-size: 20px; font-weight: bold; color: var(--text-main); margin-bottom: 4px;">{row['Tiếng Hàn']}</div>
+                <div style="font-size: 16px; color: var(--text-sub); font-style: italic;">{row['Nghĩa (English)']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("Bạn chưa lưu câu nào. Hãy thử đặt câu đầu tiên ở phía trên nhé! ✨")
