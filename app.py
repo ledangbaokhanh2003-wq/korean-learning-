@@ -56,7 +56,7 @@ st.markdown("""
 
 # 3. KẾT NỐI DỮ LIỆU GOOGLE SHEETS
 # Bạn hãy dán 2 link CSV tương ứng vào dưới đây:
-VOCAB_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1UXIB65E42LIrgxKSH2Mp0fw09NB3PC67AErwV5pFdP1e06KEBNytC7MdnlIhCANL7CNsWBa-WGOi/pub?output=csv"
+VOCAB_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1UXIB65E42LIrgxKSH2Mp0fw09NB3PC67AErwV5pFdP1e06KEBNytC7MdnlIhCANL7CNsWBa-WGOi/pub?gid=0&single=true&output=csv"
 GRAMMAR_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1UXIB65E42LIrgxKSH2Mp0fw09NB3PC67AErwV5pFdP1e06KEBNytC7MdnlIhCANL7CNsWBa-WGOi/pub?gid=954320771&single=true&output=csv" 
 
 @st.cache_data(ttl=600)
@@ -79,7 +79,7 @@ df_grammar = load_data(GRAMMAR_URL, is_grammar=True)
 
 # 4. THANH MENU BÊN TRÁI (SIDEBAR)
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/197/197414.png", width=60) # Logo cờ Hàn
+    st.image("https://flagcdn.com/w160/kr.png", width=60) # Logo cờ Hàn Quốc chuẩn
     st.title("Menu")
     menu = st.radio("Chọn không gian học tập:", ["📖 Từ vựng", "📝 Ngữ pháp"])
     st.markdown("---")
