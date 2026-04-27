@@ -63,7 +63,7 @@ st.markdown("""
     
     .badge-verb { background-color: #E6F4EA; color: #137333; }
     .badge-noun { background-color: #F1F3F5; color: #495057; }
-    .badge-topic { background-color: #FCE8E6; color: #C5221F; }
+    .badge-adj { background-color: #FFF0F5; color: #C2185B; } /* Thêm màu cho Tính từ */
 </style>
 """, unsafe_allow_html=True)
 
@@ -74,14 +74,14 @@ SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1UXIB65E42LIrgxKS
 @st.cache_data(ttl=600) # Lưu bộ nhớ đệm 10 phút để tăng tốc độ tải
 def load_data():
     try:
-        # Nếu chưa có link thật, dùng dữ liệu mẫu để demo
+        # Đọc dữ liệu và thay thế các ô trống bằng dấu "-"
         df = pd.read_csv(SHEET_URL)
+        df = df.fillna("-")
         return df
     except:
-        # Dữ liệu dự phòng nếu link Sheets lỗi
+        # Dữ liệu dự phòng khớp với cấu trúc mới
         data = [
-            {"Từ gốc": "가다", "Loại từ": "Động từ", "Nghĩa": "Đi", "Hiện tại": "가요", "Quá khứ": "갔어요", "Chủ đề": "Đời sống", "Ví dụ": "저는 사무실에 가요."},
-            {"Từ gốc": "교재", "Loại từ": "Danh từ", "Nghĩa": "Giáo trình", "Hiện tại": "-", "Quá khứ": "-", "Chủ đề": "Giáo dục", "Ví dụ": "새 교재가 있어요."}
+            {"Từ gốc": "가다", "Loại": "Động từ", "Nghĩa (English)": "To go", "Hiện tại (-요)": "가요", "Quá khứ (-았/었)": "갔어요", "Tương lai (-ㄹ 거)": "갈 거예요", "Định ngữ": "-", "Tiếp diễn (-고 있어요)": "가고 있어요", "Ví dụ": "사무실에 가요."}
         ]
         return pd.DataFrame(data)
 
@@ -89,32 +89,46 @@ df = load_data()
 
 # 4. GIAO DIỆN NGƯỜI DÙNG
 st.title("📚 나의 한국어 사전")
-st.write("Dữ liệu được cập nhật trực tiếp từ Google Sheets của bạn.")
+st.write("Dữ liệu được cập nhật trực tiếp từ Google Sheets의 bạn.")
 
 # Thanh tìm kiếm
-search = st.text_input("🔍 Tìm kiếm từ vựng...", placeholder="Nhập từ tiếng Hàn hoặc tiếng Việt")
+search = st.text_input("🔍 Tìm kiếm từ vựng...", placeholder="Nhập từ tiếng Hàn hoặc tiếng Anh/Việt")
 
-# Lọc dữ liệu
+# Lọc dữ liệu (Sửa lại tên cột Nghĩa)
 if search:
-    df = df[df['Từ gốc'].str.contains(search, case=False) | df['Nghĩa'].str.contains(search, case=False)]
+    df = df[df['Từ gốc'].str.contains(search, case=False) | df['Nghĩa (English)'].str.contains(search, case=False)]
 
 # Hiển thị dạng lưới
 cols = st.columns(3)
 for idx, row in df.iterrows():
     with cols[idx % 3]:
-        badge_type = "badge-verb" if row['Loại từ'] == "Động từ" else "badge-noun"
+        # Phân loại màu cho badge
+        if row['Loại'] == "Động từ":
+            badge_type = "badge-verb"
+        elif row['Loại'] == "Tính từ":
+            badge_type = "badge-adj"
+        else:
+            badge_type = "badge-noun"
         
+        # Bỏ đi phần "Chủ đề" vì sheet không còn cột này
         st.markdown(f"""
         <div class="card-container">
-            <span class="badge {badge_type}">{row['Loại từ']}</span>
-            <span class="badge badge-topic">{row['Chủ đề']}</span>
+            <span class="badge {badge_type}">{row['Loại']}</span>
             <div class="ko-title">{row['Từ gốc']}</div>
-            <div class="vi-meaning">{row['Nghĩa']}</div>
+            <div class="vi-meaning">{row['Nghĩa (English)']}</div>
         </div>
         """, unsafe_allow_html=True)
         
         with st.expander("Chi tiết chia thì & Ví dụ"):
-            st.write(f"**Hiện tại:** {row['Hiện tại']}")
-            st.write(f"**Quá khứ:** {row['Quá khứ']}")
+            # Chia làm 2 cột nhỏ bên trong expander cho gọn gàng
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write(f"**Hiện tại:** {row['Hiện tại (-요)']}")
+                st.write(f"**Quá khứ:** {row['Quá khứ (-았/었)']}")
+                st.write(f"**Tương lai:** {row['Tương lai (-ㄹ 거)']}")
+            with col2:
+                st.write(f"**Tiếp diễn:** {row['Tiếp diễn (-고 있어요)']}")
+                st.write(f"**Định ngữ:** {row['Định ngữ']}")
+            
             st.divider()
             st.info(f"💡 {row['Ví dụ']}")
