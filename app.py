@@ -66,7 +66,9 @@ def load_data(url, is_grammar=False):
         df.columns = df.columns.str.strip()
         df = df.fillna("-")
         return df
-    except:
+    except Exception as e:
+        st.error(f"⚠️ Lỗi đọc Google Sheets: {e}")
+        st.warning("Đang hiển thị dữ liệu dự phòng. Vui lòng kiểm tra lại link 'Publish to web'.")
         if is_grammar:
             data = [{"Cấu trúc": "-아/어서", "Ý nghĩa": "Vì... nên...", "Ví dụ": "비가 와서 집에 있어요.", "Ghi chú": "Không dùng đuôi mệnh lệnh"}]
             return pd.DataFrame(data)
