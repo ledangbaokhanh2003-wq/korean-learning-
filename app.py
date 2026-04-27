@@ -157,24 +157,27 @@ if menu == "📖 Từ vựng":
                 else: badge_type = "badge-noun"
                 
                 st.markdown(f"""
-                <div class="card-container">
-                    <span class="badge {badge_type}">{row['Loại']}</span>
-                    <div class="ko-title">{row['Từ gốc']}</div>
-                    <div class="vi-meaning">{row['Nghĩa (English)']}</div>
-                </div>
+                <details class="custom-expander">
+                    <summary class="card-container">
+                        <span class="badge {badge_type}">{row['Loại']}</span>
+                        <div class="ko-title">{row['Từ gốc']}</div>
+                        <div class="vi-meaning">{row['Nghĩa (English)']}</div>
+                        <div style="position: absolute; top: 20px; right: 20px; color: var(--text-sub); opacity: 0.5; font-size: 12px;">▼</div>
+                    </summary>
+                    <div class="expanded-content">
+                        <div class="grid-container">
+                            <div><b>Hiện tại:</b> {row.get('Hiện tại (-요)', '-')}</div>
+                            <div><b>Tiếp diễn:</b> {row.get('Tiếp diễn (-고 있어요)', '-')}</div>
+                            <div><b>Quá khứ:</b> {row.get('Quá khứ (-았/었)', '-')}</div>
+                            <div><b>Định ngữ:</b> {row.get('Định ngữ', '-')}</div>
+                            <div><b>Tương lai:</b> {row.get('Tương lai (-ㄹ 거예요)', '-')}</div>
+                        </div>
+                        <div class="example-box">
+                            💡 <b>Ví dụ:</b><br>{row.get('Ví dụ', '-')}
+                        </div>
+                    </div>
+                </details>
                 """, unsafe_allow_html=True)
-                
-                with st.expander("Chi tiết chia thì & Ví dụ"):
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.write(f"**Hiện tại:** {row.get('Hiện tại (-요)', '-')}")
-                        st.write(f"**Quá khứ:** {row.get('Quá khứ (-았/었)', '-')}")
-                        st.write(f"**Tương lai:** {row.get('Tương lai (-ㄹ 거예요)', '-')}")
-                    with col2:
-                        st.write(f"**Tiếp diễn:** {row.get('Tiếp diễn (-고 있어요)', '-')}")
-                        st.write(f"**Định ngữ:** {row.get('Định ngữ', '-')}")
-                    st.divider()
-                    st.info(f"💡 {row.get('Ví dụ', '-')}")
 
     tab_all, tab_verb, tab_adj, tab_noun = st.tabs(["🌎 Tất cả", "🏃 Động từ", "🎨 Tính từ", "📦 Danh từ & Khác"])
 
