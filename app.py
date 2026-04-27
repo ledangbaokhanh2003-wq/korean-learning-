@@ -76,12 +76,16 @@ def load_data():
     try:
         # Đọc dữ liệu và thay thế các ô trống bằng dấu "-"
         df = pd.read_csv(SHEET_URL)
+        
+        # DÒNG MỚI: Tự động xóa khoảng trắng thừa ở đầu/cuối tên cột (Chống lỗi KeyError)
+        df.columns = df.columns.str.strip()
+        
         df = df.fillna("-")
         return df
     except:
         # Dữ liệu dự phòng khớp với cấu trúc mới
         data = [
-            {"Từ gốc": "가다", "Loại": "Động từ", "Nghĩa (English)": "To go", "Hiện tại (-요)": "가요", "Quá khứ (-았/었)": "갔어요", "Tương lai (-ㄹ 거)": "갈 거예요", "Định ngữ": "-", "Tiếp diễn (-고 있어요)": "가고 있어요", "Ví dụ": "사무실에 가요."}
+            {"Từ gốc": "가다", "Loại": "Động từ", "Nghĩa (English)": "To go", "Hiện tại (-요)": "가요", "Quá khứ (-았/었)": "갔어요", "Tương lai (-ㄹ 거예요)": "갈 거예요", "Định ngữ": "-", "Tiếp diễn (-고 있어요)": "가고 있어요", "Ví dụ": "사무실에 가요."}
         ]
         return pd.DataFrame(data)
 
@@ -125,7 +129,7 @@ for idx, row in df.iterrows():
             with col1:
                 st.write(f"**Hiện tại:** {row['Hiện tại (-요)']}")
                 st.write(f"**Quá khứ:** {row['Quá khứ (-았/었)']}")
-                st.write(f"**Tương lai:** {row['Tương lai (-ㄹ 거)']}")
+                st.write(f"**Tương lai:** {row['Tương lai (-ㄹ 거예요)']}")
             with col2:
                 st.write(f"**Tiếp diễn:** {row['Tiếp diễn (-고 있어요)']}")
                 st.write(f"**Định ngữ:** {row['Định ngữ']}")
